@@ -2106,7 +2106,7 @@ unsigned char* getA(string fileName, int* pSizeOut, bool bAddBasePath, bool bAut
 
 	/*
 	action|log
-msg|`4UPDATE REQUIRED!`` : The `$V2.981`` update is now available for your device.  Go get it!  You'll need to install it before you can play online.
+|`4UPDATE REQUIRED!`` : The `$V2.981`` update is now available for your device.  Go get it!  You'll need to install it before you can play online.
 [DBG] Some text is here: action|set_url
 url|http://ubistatic-a.akamaihd.net/0098/20180909/GrowtopiaInstaller.exe
 label|Download Latest Version
@@ -2172,6 +2172,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	worldDB.get("MAIN");
 	worldDB.get("NEW");
 	worldDB.get("ADMIN");
+	worldDB.get("START");
 	ENetAddress address;
 	/* Bind the server to the default localhost.     */
 	/* A specific host address can be specified by   */
@@ -3015,7 +3016,60 @@ int _tmain(int argc, _TCHAR* argv[])
 						delete data;
 						delete p.data;
 					}
-					
+					}
+					else if (str.substr(0, 5) == "/gsm ") {
+						using namespace std::chrono;
+						if (((PlayerInfo*)(peer->data))->lastSB + 450 < (duration_cast<milliseconds>(system_clock::now().time_since_epoch())).count())
+						else {
+							GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "Wait a minute before using the Global System Message command again!"));
+							ENetPacket * packet = enet_packet_create(p.data,
+								p.len,
+								ENET_PACKET_FLAG_RELIABLE);
+
+							enet_peer_send(peer, 0, packet);
+							delete p.data;
+							//enet_host_flush(server);
+							continue;
+						}
+
+						string name = ((PlayerInfo*)(peer->data))->displayName;
+						GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`w** `4Global System Message``** :`` `o " + str.substr(5, cch.length() - 5 - 1)));
+						GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4ALERT! `oGlobal System Message Sent."));
+						string text = "action|play_sfx\nfile|audio/dialog_confirm.wav\ndelayMS|0\n";
+						BYTE* data = new BYTE[5 + text.length()];
+						BYTE zero = 0;
+						int type = 3;
+						memcpy(data, &type, 4);
+						memcpy(data + 4, text.c_str(), text.length());
+						memcpy(data + 4 + text.length(), &zero, 1);
+						ENetPeer * currentPeer;
+						
+						for (currentPeer = server->peers;
+							currentPeer < &server->peers[server->peerCount];
+							++currentPeer)
+						{
+							if (currentPeer->state != ENET_PEER_STATE_CONNECTED)
+								continue;
+							ENetPacket * packet = enet_packet_create(p.data,
+								p.len,
+								ENET_PACKET_FLAG_RELIABLE);
+
+							enet_peer_send(currentPeer, 0, packet);
+							
+							
+							
+							
+							ENetPacket * packet2 = enet_packet_create(data,
+								5+text.length(),
+								ENET_PACKET_FLAG_RELIABLE);
+
+							enet_peer_send(currentPeer, 0, packet2);
+							
+							//enet_host_flush(server);
+						}
+						delete data;
+						delete p.data;
+					}
 					
 					else if (str.substr(0, 6) == "/radio") {
 						GamePacket p;
