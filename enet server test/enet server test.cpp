@@ -3018,7 +3018,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					}
 					}
 					else if (str.substr(0, 5) == "/gsm ") {
-						if (!canSB(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass)) continue;
+						if (!isSuperAdmin(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass)) break;
 						using namespace std::chrono;
 						if (((PlayerInfo*)(peer->data))->lastSB + 450 < (duration_cast<milliseconds>(system_clock::now().time_since_epoch())).count())
 						else {
@@ -3034,8 +3034,9 @@ int _tmain(int argc, _TCHAR* argv[])
 						}
 
 						string name = ((PlayerInfo*)(peer->data))->displayName;
-						GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`w** `4Global System Message```w:`` `o " + str.substr(5, cch.length() - 5 - 1)));
-						GamePacket p2 = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4ALERT! `6Global System Message Sent."));
+						GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`$** `$Global System Message```$:`5 " + str.substr(5, cch.length() - 5 - 1)));
+						GamePacket p2 = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`4ALERT! `6Global System Message Sent.`6 With Message: " + str.substr(5, cch.length() - 5 - 1)));
+						cout << "User " << ((PlayerInfo*)(peer->data))->rawName << << "with IP " << std::hex << peer->address.host << std::dec << " Sent a Global System Message with message " << str.substr(5, cch.length() - 5 - 1) << endl;
 						string text = "action|play_sfx\nfile|audio/dialog_confirm.wav\ndelayMS|0\n";
 						BYTE* data = new BYTE[5 + text.length()];
 						BYTE zero = 0;
@@ -3070,6 +3071,7 @@ int _tmain(int argc, _TCHAR* argv[])
 						}
 						delete data;
 						delete p.data;
+						delete p2.data
 					}
 					
 					else if (str.substr(0, 6) == "/radio") {
