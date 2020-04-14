@@ -2106,7 +2106,7 @@ unsigned char* getA(string fileName, int* pSizeOut, bool bAddBasePath, bool bAut
 
 	/*
 	action|log
-|`4UPDATE REQUIRED!`` : The `$V2.981`` update is now available for your device.  Go get it!  You'll need to install it before you can play online.
+msg|`4UPDATE REQUIRED!`` : The `$V2.981`` update is now available for your device.  Go get it!  You'll need to install it before you can play online.
 [DBG] Some text is here: action|set_url
 url|http://ubistatic-a.akamaihd.net/0098/20180909/GrowtopiaInstaller.exe
 label|Download Latest Version
@@ -3015,7 +3015,6 @@ int _tmain(int argc, _TCHAR* argv[])
 						}
 						delete data;
 						delete p.data;
-					}
 					}
 					else if (str.substr(0, 5) == "/gsm ") {
 						if (!isSuperAdmin(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass)) break;
